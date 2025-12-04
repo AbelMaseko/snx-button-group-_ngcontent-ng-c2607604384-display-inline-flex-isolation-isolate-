@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Sign-In | Sync App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Import Firebase libraries
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { 
+      getAuth, 
+      GoogleAuthProvider, 
+      signInWithPopup,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // --------------------------
+    //  Your Firebase Config
+    // --------------------------
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "XXXXXXXXXXXX",
+      appId: "YOUR_APP_ID",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // ------------------------------
+    //  Sign In with Google
+    // ------------------------------
+    async function googleLogin() {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+
+        document.getElementById("status").innerHTML =
+          "Logged in as: " + user.email;
+      } catch (error) {
+        console.error(error);
+        alert("Login error: " + error.message);
+      }
+    }
+
+    // ------------------------------
+    //  Sign Out
+    // ------------------------------
+    function googleLogout() {
+      signOut(auth);
+    }
+
+    // ------------------------------
+    // Listener — stays logged in
+    // across devices
+    // ------------------------------
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById("status").innerHTML =
+          "Logged in as: " + user.email;
+      } else {
+        document.getElementById("status").innerHTML = "Not logged in";
+      }
+    });
+
+    window.googleLogin = googleLogin;
+    window.googleLogout = googleLogout;
+  </script>
+
+</head>
+<body style="font-family: Arial">
+
+  <h2>Sign in With Google</h2>
+
+  <p id="status">Checking login...</p>
+
+  <button onclick="googleLogin()">Sign in with Gmail</button>
+  <button onclick="googleLogout()">Sign out</button>
+
+</body>
+</html>
